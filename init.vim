@@ -1,80 +1,77 @@
 " 初始化插件管理器 vim-plug
 call plug#begin('~/.local/share/nvim/plugged')
 
-" Markdown 编辑支持
-Plug 'plasticboy/vim-markdown', {'for': 'markdown'}
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install', 'for': 'markdown', 'cmd': 'MarkdownPreview' }
-Plug 'ferrine/md-img-paste.vim', {'for': 'markdown'}
+" 界面美化插件
+Plug 'vim-airline/vim-airline' " 状态栏美化
+Plug 'vim-airline/vim-airline-themes' " 状态栏主题
+Plug 'kyazdani42/nvim-web-devicons' " 文件图标
 
-" 文件浏览器
-Plug 'preservim/nerdtree', {'on': 'NERDTreeToggle'}
+" 颜色方案
+Plug 'joshdick/onedark.vim' " One Dark 主题
+Plug 'Mofiqul/dracula.nvim'  " Dracula Pro 主题 (专为 Neovim 设计)
+Plug 'rakr/vim-one' " Vim One 主题
+Plug 'morhetz/gruvbox' " Gruvbox 主题
+Plug 'ful1e5/onedark.nvim' " OneDark Pro 主题
+Plug 'ChristianChiarulli/nvcode-color-schemes.vim' " NVCode 主题，提供纯黑背景
 
-" 代码补全
-Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': 'yarn install --frozen-lockfile'}
+" 编辑增强插件
+Plug 'godlygeek/tabular' " 对齐文本
+Plug 'plasticboy/vim-markdown' " Markdown 编辑
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+Plug 'ferrine/md-img-paste.vim' " Markdown 图片粘贴
+Plug 'preservim/nerdtree' " 文件浏览器
 
-" 语法高亮
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-
-" Lua 函数库，某些插件依赖
-Plug 'nvim-lua/plenary.nvim'
-
-" 强大的搜索工具
-Plug 'nvim-telescope/telescope.nvim', {'cmd': 'Telescope'}
-
-" 语言服务器配置
-Plug 'neovim/nvim-lspconfig'
-
-" Git 集成
-Plug 'tpope/vim-fugitive'
-
-" 代码片段
-Plug 'SirVer/ultisnips', {'on': ['UltiSnipsEdit', 'UltiSnipsListSnippets']}
-Plug 'honza/vim-snippets'
+" 代码开发插件
+Plug 'neoclide/coc.nvim', {'branch': 'release'} " 代码补全
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " 语法高亮
+Plug 'nvim-lua/plenary.nvim' " Lua 函数库，某些插件依赖
+Plug 'nvim-telescope/telescope.nvim' " 强大的搜索工具
+Plug 'neovim/nvim-lspconfig' " 语言服务器配置
+Plug 'tpope/vim-fugitive' " Git 集成
+Plug 'SirVer/ultisnips' " 代码片段
+Plug 'honza/vim-snippets' " 代码片段库
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' } " Go 语言开发支持
 
 " 结束插件列表
 call plug#end()
 
 " 配置选项
-colorscheme gruvbox " 激活 gruvbox 主题
+set background=dark " 设置背景为暗色
+colorscheme dracula
+set termguicolors
+let g:vim_markdown_folding_disabled = 1
 set number " 显示行号
-syntax on " 开启语法高亮
+
 
 " 快捷键映射
-nnoremap <F2> :NERDTreeToggle<CR>
-nnoremap <F8> :MarkdownPreview<CR>
-nnoremap <F9> :MarkdownPreviewStop<CR>
-autocmd FileType markdown nnoremap <buffer><silent> <leader>i :call mdip#MarkdownClipboardImage()<CR>
-let g:mdip_imgdir = 'img'
-let g:mdip_imgname = 'clipboard_img_%Y%m%d%H%M%S'
+map <F2> :NERDTreeToggle<CR>
+nmap <silent> <F8> <Plug>MarkdownPreview
+imap <silent> <F8> <Plug>MarkdownPreview
+nmap <silent> <F9> <Plug>StopMarkdownPreview
+imap <silent> <F9> <Plug>StopMarkdownPreview
+autocmd FileType markdown nmap <buffer><silent> <leader>i :call mdip#MarkdownClipboardImage()<CR>
+let g:mdip_imgdir = '.'
+let g:mdip_imgname = 'image'
 
 " 补全和代码片段配置
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 inoremap <expr> <CR> pumvisible() ? coc#_select_confirm() : "\<CR>"
 
-" CoC 配置
-let g:coc_global_extensions = ['coc-snippets', 'coc-pairs', 'coc-tsserver', 'coc-python', 'coc-rust-analyzer', 'coc-clangd']
+" 激活 vim-go 自动补全
+let g:go_def_mode = 'gopls'
+let g:go_info_mode = 'gopls'
+let g:go_fmt_command = 'goimports'
 
-" Treesitter 配置
-lua << EOF
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = "maintained",
-  highlight = {
-    enable = true,
-    additional_vim_regex_highlighting = false,
-  },
-}
-EOF
+" 设置 Go 语言的编译器和错误信息格式化程序
+let g:go_metalinter_command = 'golangci-lint'
+let g:go_metalinter_autosave = 1
+let g:go_metalinter_autosave_enabled = ['vet', 'golint']
 
-" Telescope 配置
-nnoremap <leader>f :Telescope find_files<CR>
-nnoremap <leader>g :Telescope live_grep<CR>
+" CoC 插件扩展安装提示
+" 请在 Neovim 中运行以下命令安装对应语言的 CoC 扩展：
+" :CocInstall coc-python coc-rust-analyzer coc-clangd coc-tsserver
+" 这将分别安装 Python、Rust、C/C++ 和 TypeScript 的支持。
 
-" Vim 编辑器行为优化
-set noswapfile " 关闭交换文件
-set nobackup " 关闭备份文件
-set nowritebackup " 关闭写入备份文件
-set updatetime=300 " 加快更新时间
-set shortmess+=c " 不显示补全时的消息
-
-" 如果有更多具体的功能需求，可以继续添加相应的配置项
+" Treesitter 语言安装提示
+" 使用 :TSInstall
