@@ -64,6 +64,7 @@ cmp.setup({
     { name = 'buffer' },
   })
 })
+
 -- 主题设置
 vim.o.termguicolors = true
 vim.cmd[[colorscheme gruvbox]]
@@ -77,6 +78,10 @@ require('lualine').setup {
     section_separators = { left = '', right = ''},
   },
 }
+
+-- 显示行号设置
+vim.o.number = true               -- 开启绝对行号
+vim.o.relativenumber = true       -- 开启相对行号
 
 -- nvim-autopairs 设置
 require('nvim-autopairs').setup{}
