@@ -9,6 +9,9 @@ require('packer').startup(function()
   use 'wbthomason/packer.nvim'
   -- 插件列表
   use 'gruvbox-community/gruvbox' -- 主题颜色方案
+  use { "catppuccin/nvim", as = "catppuccin" }
+  use { "scottmckendry/cyberdream.nvim", as = "cyberdream" }
+  
   use {
     'hoob3rt/lualine.nvim', -- 状态栏
     requires = {'kyazdani42/nvim-web-devicons', opt = true}
@@ -67,13 +70,13 @@ cmp.setup({
 
 -- 主题设置
 vim.o.termguicolors = true
-vim.cmd[[colorscheme gruvbox]]
+vim.cmd[[colorscheme cyberdream]]
 
 -- 状态栏设置
 require('lualine').setup {
   options = {
     icons_enabled = true,
-    theme = 'gruvbox',
+    theme = 'catppuccin',
     component_separators = { left = '|', right = '|'},
     section_separators = { left = '', right = ''},
   },
@@ -101,4 +104,3 @@ vim.cmd([[
     autocmd BufWritePost init.lua source <afile> | PackerCompile
   augroup end
 ]])
-
