@@ -11,12 +11,25 @@ require('packer').startup(function()
   use 'gruvbox-community/gruvbox' -- 主题颜色方案
   use { "catppuccin/nvim", as = "catppuccin" }
   use { "scottmckendry/cyberdream.nvim", as = "cyberdream" }
-  
+  use {"folke/tokyonight.nvim", as = "tokyonight"}
+
+  use {'akinsho/bufferline.nvim', tag = "*", requires = 'nvim-tree/nvim-web-devicons'}
+  use {
+    'nvim-telescope/telescope.nvim', tag = '0.1.6',     -- telescope插件
+    requires = { {'nvim-lua/plenary.nvim'} }
+  }
   use {
     'hoob3rt/lualine.nvim', -- 状态栏
     requires = {'kyazdani42/nvim-web-devicons', opt = true}
   }
+  --nvim-tree
+  use {
+  'nvim-tree/nvim-tree.lua',
+  requires = {
+    'nvim-tree/nvim-web-devicons',}, --optional
+  }
   use 'neovim/nvim-lspconfig' -- LSP 支持
+  use 'simrat39/rust-tools.nvim' -- rust-tools
   use 'hrsh7th/nvim-cmp' -- 自动补全引擎
   use 'hrsh7th/cmp-nvim-lsp' -- LSP 自动补全源
   use 'hrsh7th/cmp-buffer' -- 缓冲区补全源
@@ -26,6 +39,13 @@ require('packer').startup(function()
   use 'saadparwaiz1/cmp_luasnip' -- LuaSnip 补全源
   use 'windwp/nvim-autopairs' -- 括号自动补全
   use 'nvim-treesitter/nvim-treesitter' -- 高级语法高亮
+  use({"stevearc/oil.nvim",
+    config = function()
+      require("oil").setup()
+    end,
+    }) -- oil插件
+  use {'gen740/SmoothCursor.nvim'} --SmoothCursor插件
+
 end)
 
 -- LSP 基础设置
@@ -72,11 +92,32 @@ cmp.setup({
 vim.o.termguicolors = true
 vim.cmd[[colorscheme cyberdream]]
 
+-- nvim-tree
+require("nvim-tree").setup{}
+vim.keymap.set('n','<A-m>',":NvimTreeToggle<CR>")
+
+-- buffertab设置
+require("bufferline").setup {
+    options = {
+        -- 使用 nvim 内置lsp
+        diagnostics = "nvim_lsp",
+        -- 左侧让出 nvim-tree 的位置
+        offsets = {{
+            filetype = "NvimTree",
+            text = "File Explorer",
+            highlight = "Directory",
+            text_align = "left"
+        }}
+    }
+}
+vim.keymap.set('n',"<C-h>",":BufferLineCyclePrev<CR>")
+vim.keymap.set('n',"<C-l>",":BufferLineCycleNext<CR>")
+
 -- 状态栏设置
 require('lualine').setup {
   options = {
     icons_enabled = true,
-    theme = 'catppuccin',
+    theme = 'tokyonight',
     component_separators = { left = '|', right = '|'},
     section_separators = { left = '', right = ''},
   },
@@ -96,6 +137,25 @@ require'nvim-treesitter.configs'.setup {
     enable = true,
   },
 }
+
+-- rust-tools
+require('rust-tools').setup{}
+
+-- telescope快捷键
+local builtin = require('telescope.builtin')
+vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+
+-- oil 插件
+require("oil").setup()
+vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+
+-- SmoothCursor 插件
+require('smoothcursor').setup({
+        type = "matrix",
+})
 
 -- 运行 PackerCompile，如果 init.lua 被更改
 vim.cmd([[
